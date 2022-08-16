@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>My Extension</title>
+    <link rel="stylesheet" href="./css/popup/main.css">
+    <script type="module" src="./popup.js"></script>
+</head>
+
+<body>
+    <div class="popup-wrapper">
+        <h1>Tôi giúp gì được cho bạn =)))</h1>
+        <form id="config-form" class="main-form">
+            <div class="form__content">
+                <div class="config toggle -log-sang">
+                    <h3>Log Sáng</h3>
+                    <div class="toggle-switch">
+                        <input type="checkbox" class="checkbox-toggle" name="log-sang" id="log-sang" value="1">
+                        <label class="indicator" for="log-sang"></label>
+                    </div>
+                </div>
+                <div class="config toggle -stop-log-sang">
+                    <h3>Stop Sáng</h3>
+                    <div class="toggle-switch">
+                        <input type="checkbox" class="checkbox-toggle" name="stop-sang" id="stop-sang" value="1">
+                        <label class="indicator" for="stop-sang"></label>
+                    </div>
+                </div>
+                <div class="config toggle -log-chieu">
+                    <h3>Log Chiều</h3>
+                    <div class="toggle-switch">
+                        <input type="checkbox" class="checkbox-toggle" name="log-chieu" id="log-chieu" value="1">
+                        <label class="indicator" for="log-chieu"></label>
+                    </div>
+                </div>
+                <div class="config toggle -stop-log-chieu">
+                    <h3>Stop Log Chiều</h3>
+                    <div class="toggle-switch">
+                        <input type="checkbox" class="checkbox-toggle" name="stop-chieu" id="stop-chieu" value="1">
+                        <label class="indicator" for="stop-chieu"></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form__footer">
+                <div class="action-wrapper">
+                    <button class="action btn -save-config">Lưu</button>
+                    <button class="action btn -start">Bắt Đầu</button>
+                </div>
+
+                <div class="messages-wrapper">
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

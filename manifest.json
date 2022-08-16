@@ -1,0 +1,28 @@
+{
+  "name": "Auto Log Giờ",
+  "description": "Auto Log giờ BSS Group",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "action": {
+    "default_icon": {
+        "19": "images/ico/time.png",
+        "38": "images/ico/time.png"
+    },
+    "default_title": "Auto Log Giờ :))",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://hr.bssgroup.vn/log-gio-lam-viec.html"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "clipboardWrite"]
+}
