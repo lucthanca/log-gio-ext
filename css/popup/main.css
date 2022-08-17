@@ -197,6 +197,9 @@ body {
   --green74: #66b574;
   --red300: #e17e65;
 }
+.toggle-switch {
+  cursor: pointer;
+}
 .toggle {
   position: relative;
 }
@@ -300,4 +303,19 @@ body {
 }
 .toggle-switch .checkbox-toggle:checked + label {
   left: 70%;
+}
+.script-state-message {
+  padding: 7px;
+  border-radius: 12px;
+  font-weight: 500;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 1rem;
+  margin-top: 15px;
+}
+.script-state-message.running {
+  background: var(--green74);
+}
+.script-state-message.stopped {
+  background: var(--red300);
 }

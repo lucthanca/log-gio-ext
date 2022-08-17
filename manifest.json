@@ -14,7 +14,7 @@
   "content_scripts": [
     {
       "matches": [
-        "*://hr.bssgroup.vn/log-gio-lam-viec.html"
+        "https://*/*"
       ],
       "js": [
         "content.js"
@@ -24,5 +24,12 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["storage", "clipboardWrite"]
+  "permissions": [
+    "tabs",
+    "storage",
+    "clipboardWrite"
+  ],
+  "content_security_policy": {
+    "extension_page": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+ }
 }

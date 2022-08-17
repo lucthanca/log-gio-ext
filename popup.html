@@ -3,9 +3,12 @@
 
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-eval' 'self'">
     <title>My Extension</title>
     <link rel="stylesheet" href="./css/popup/main.css">
-    <script type="module" src="./popup.js"></script>
+    <!-- <script src="./libs/alpinejs.min.js" defer></script> -->
+    <script type="module" src="./popup.js" defer></script>
+    
 </head>
 
 <body>
@@ -20,13 +23,7 @@
                         <label class="indicator" for="log-sang"></label>
                     </div>
                 </div>
-                <div class="config toggle -stop-log-sang">
-                    <h3>Stop Sáng</h3>
-                    <div class="toggle-switch">
-                        <input type="checkbox" class="checkbox-toggle" name="stop-sang" id="stop-sang" value="1">
-                        <label class="indicator" for="stop-sang"></label>
-                    </div>
-                </div>
+                
                 <div class="config toggle -log-chieu">
                     <h3>Log Chiều</h3>
                     <div class="toggle-switch">
@@ -51,9 +48,12 @@
 
                 <div class="messages-wrapper">
                 </div>
+
+                <div class="script-state-message running">
+                    <p>Script is running...</p>
+                </div>
             </div>
         </form>
     </div>
 </body>
-
 </html>

@@ -1,17 +1,69 @@
-document.addEventListener("DOMContentLoaded", function () {
+if (document.readyState !== 'loading') {
+  console.log('Loading Script thành công!!!');
+  initPopupContext();
+} else {
+  document.addEventListener('DOMContentLoaded', function () {
+    console.log('Loading Script thành công!!!');
+    initPopupContext();
+  });
+}
+import { isRunning, toggleState, saveConfig, fetchExtData } from './api-service.js';
 
+let messageWrapper = document.querySelector('.messages-wrapper');
+function getTabsList(showOnlyCurrentWindow = false) {
+  return new Promise(resolve => {
+    if (showOnlyCurrentWindow) {
+      chrome.windows.getCurrent({ populate: true }, window => {
+        // chrome.tabs.getAllInWindow(window.id, tabs => {
+        //   resolve(tabs);
+        // })
+
+        const queryinfo = {
+          currentWindow: true,
+        };
+
+        chrome.tabs.query(queryinfo, tabs => {
+          resolve(tabs);
+        })
+      });  
+    } else {
+      chrome.windows.getAll({ populate: true }, listOfWindows => {
+        resolve(listOfWindows);
+      });
+    }
+  });
+}
+
+let startScriptBtn = document.querySelector('.-start');
+startScriptBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  isRunning().then(running => {
+    if (running !== true) {
+      toggleState().then(response => {
+        messageWrapper.dispatchEvent(
+          new CustomEvent(
+            'dispatch-messages',
+             {detail: {messages: [{type: response.type, message: response.message}]}}
+          )
+        );
+        startScriptBtn.innerText = "Dừng";
+        startScriptBtn.classList.add('running');
+      });
+    } else {
+      toggleState(false).then(response => {
+        messageWrapper.dispatchEvent(
+          new CustomEvent(
+            'dispatch-messages',
+             {detail: {messages: [{type: response.type, message: response.message}]}}
+          )
+        );
+        startScriptBtn.innerText = "Bắt Đầu";
+        startScriptBtn.classList.remove('running');
+      });
+    }
+  });
+  
 });
-
-
-// $(document).ready(function () {
-//   var songs =  JSON.parse(localStorage.songs || '[]');
-//   var songHTML = null;
-
-//   songs.forEach(song => {
-//       songHTML = $(`<a href="${song.link}" target="_blank">${song.name}</a>`);
-//       $('.wrapper').append(songHTML);
-//   })
-// });
 
 /**
  *  Xử lý bật tắt cho container và label for
@@ -47,7 +99,6 @@ Array.from(indicators).forEach(element => {
   element.addEventListener('click', handleToggle.bind(event));
 });
 
-let messageWrapper = document.querySelector('.messages-wrapper');
 let saveConfBtn = document.querySelector('.-save-config');
 saveConfBtn.addEventListener('click', function (e) {
   e.preventDefault();
@@ -57,14 +108,9 @@ saveConfBtn.addEventListener('click', function (e) {
   saveData['stop-sang'] = parseInt(formData.get('stop-sang')) === 1;
   saveData['log-chieu'] = parseInt(formData.get('log-chieu')) === 1;
   saveData['stop-chieu'] = parseInt(formData.get('stop-chieu')) === 1;
-  // console.log(123);
-  // chrome.storage.sync.get(['logTimeData'], function (r) {
-  //   console.log(r);
-  // });
   // chrome.storage.sync.clear();
-  // return false;
-  chrome.runtime.sendMessage({'save-config': saveData}, function (response) {
-    messageWrapper.dispatchEvent('dispatch-messages', {detail: {messages: [{type: response.type, message: response.message}]}});
+  saveConfig(saveData).then(response => {
+    messageWrapper.dispatchEvent(new CustomEvent('dispatch-messages', {detail: {messages: [{type: response.type, message: response.message}]}}));
   });
 });
 
@@ -84,9 +130,30 @@ messageWrapper.addEventListener('dispatch-messages', function (e, f) {
   e.target.innerHTML = html;
 });
 
-window.onload = function (e) {
-  chrome.runtime.sendMessage({'fetch-config': {}}, function (response) {
-    let config = response.config;
-    console.log(config);
-  });
+async function initPopupContext () {
+  let data = await fetchExtData();
+  console.log(data);
+  if (data.configs) {
+    let eles = ['log-sang', 'log-chieu', 'stop-chieu'];
+    eles.forEach(elName => {
+      if (data.configs[elName] === true) {
+        let $ele = document.getElementById(elName);
+        $ele.checked = true;
+        $ele.closest('.toggle').classList.add('active');
+      }
+    })
+  }
+
+  let stateContainer = document.getElementsByClassName('script-state-message');
+  if (data.running) {
+    let btnStart = document.querySelector('.action.btn.-start');
+    btnStart.innerText = "Dừng";
+    stateContainer.classList.add('running');
+    stateContainer.classList.remove('stopped');
+    stateContainer.innerHTML = `<p>Script is running...</p>`;
+  } else {
+    stateContainer.classList.add('stopped');
+    stateContainer.classList.remove('running');
+    stateContainer.innerHTML = `<p>Script is stopped!!!</p>`;
+  }
 }
