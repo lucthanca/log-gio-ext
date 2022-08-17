@@ -32,9 +32,22 @@ const saveConfig = (config) => {
   });
 }
 
+const logTime = () => {
+  return new Promise((resolve, reject) => {
+    try {
+      chrome.runtime.sendMessage({'log-time': {}}, function (response) {
+        resolve(response);
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
 export {
   isRunning,
   toggleState,
   saveConfig,
-  fetchExtData
+  fetchExtData,
+  logTime
 }

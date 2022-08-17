@@ -3,6 +3,10 @@
   "description": "Auto Log giờ BSS Group",
   "version": "1.0.0",
   "manifest_version": 3,
+  "icons": {
+    "16": "images/ico/time.png",
+    "48": "images/ico/time.png"
+  },
   "action": {
     "default_icon": {
         "19": "images/ico/time.png",
@@ -14,7 +18,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://*/*"
+        "https://hr.bssgroup.vn/log-gio-lam-viec.html*"
       ],
       "js": [
         "content.js"

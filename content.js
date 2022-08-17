@@ -1,14 +1,25 @@
+const logTime = () => {
+  return new Promise((resolve, reject) => {
+    try {
+      chrome.runtime.sendMessage({'log-time': {}}, function (response) {
+        resolve(response);
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
 if (document.readyState !== 'loading') {
-  console.log('Loading Script thành công!!!');
+  console.log('Auto Log Giờ Script đã được load!!!');
   initExtensionContext();
 } else {
   document.addEventListener('DOMContentLoaded', function () {
-    console.log('Loading Script thành công!!!');
+    console.log('Auto Log Giờ Script đã được load!!!');
     initExtensionContext();
   });
 }
 function initExtensionContext() {
-  var button = document.createElement('button');
   var injectTimestampInput = document.createElement('input');
   injectTimestampInput.setAttribute('type', 'hidden');
   injectTimestampInput.setAttribute('name', 'open_time');
@@ -16,20 +27,11 @@ function initExtensionContext() {
   
   document.body.append(injectTimestampInput);
 
-  chrome.runtime.sendMessage({'get-tabs': {}}, (response) => {
-    // 3. Got an asynchronous response with the data from the background
-    console.log(response);
-  });
-
-  button.innerHTML = 'Add to Playlist';
-  document.body.prepend(button);
-
-  button.addEventListener('click', function () {
-      var link = window.location.href;
-      var name = document.querySelector('.list-group.list-menu').innerText;
-      chrome.extension.sendMessage({
-          type: 'add-song', 
-          data: {link, name}
-      });
-  });
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  const isAutolog = urlParams.get('autolog')
+  if (isAutolog === '1') {
+    // Execute click log button
+    logTime();
+  }
 }

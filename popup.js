@@ -105,9 +105,11 @@ saveConfBtn.addEventListener('click', function (e) {
   let el = e.currentTarget, form = el.closest('#config-form'), saveData = {};
   const formData = new FormData(form);
   saveData['log-sang'] = parseInt(formData.get('log-sang')) === 1;
-  saveData['stop-sang'] = parseInt(formData.get('stop-sang')) === 1;
+  saveData['log-sang-time'] = '08:29:00';
   saveData['log-chieu'] = parseInt(formData.get('log-chieu')) === 1;
+  saveData['log-chieu-time'] = '13:00:00';
   saveData['stop-chieu'] = parseInt(formData.get('stop-chieu')) === 1;
+  saveData['stop-chieu-time'] = '18:59:00';
   // chrome.storage.sync.clear();
   saveConfig(saveData).then(response => {
     messageWrapper.dispatchEvent(new CustomEvent('dispatch-messages', {detail: {messages: [{type: response.type, message: response.message}]}}));
@@ -144,7 +146,7 @@ async function initPopupContext () {
     })
   }
 
-  let stateContainer = document.getElementsByClassName('script-state-message');
+  let stateContainer = document.getElementById('script-state-message');
   if (data.running) {
     let btnStart = document.querySelector('.action.btn.-start');
     btnStart.innerText = "Dừng";
