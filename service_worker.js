@@ -1,11 +1,19 @@
 let runningTask, activeTab;
 chrome.runtime.onInstalled.addListener( () => {
-  console.log("hello world");
+  console.log("Khởi tạo Service Worker...");
+
+  chrome.notifications.create('', {
+    title: 'Mỗi ngày một xiên bẩn =))',
+    message: 'Mặc định log sáng: 08:29. chiều: 13:00, stop chiều: 18:55',
+    iconUrl: './images/meo-cuoi-nham-hiem_medium.jpg',
+    type: 'basic',
+    requireInteraction: true
+  });
 
   let response = loadLogTimeData();
   return response.then(logTimeData => {
     if (logTimeData?.running === true) {
-      console.log('auto create task by store config');
+      console.log('Tái tạo tác vụ...');
       runningTask = createRunningTaskInterval(60000);
     }
   });
@@ -80,7 +88,7 @@ const configProcessorMappers = {
 
 function createRunningTaskInterval(intervalTime = 60000) {
   return setInterval(async () => {
-    console.log('checking time...');
+    console.log('Checking time...');
     let logTimeData = await loadLogTimeData();
     if (!logTimeData?.configs) {
       return false
@@ -105,14 +113,14 @@ function createRunningTaskInterval(intervalTime = 60000) {
           if (count >= 1) {
             chrome.tabs.remove(tab.id, () => {});
           }
-          console.log('run '+ tab.id);
+          /// DEBUG: console.log('run '+ tab.id);
           count++;
           activeTab = tab;
         }
         return true;
       });
   
-      console.log('count: ' + count);
+      // DEBUG: console.log('count: ' + count);
       if (count === 0) {
         chrome.tabs.create({'url': `https://hr.bssgroup.vn/log-gio-lam-viec.html?autolog=1`}, function(tab) {
           chrome.tabs.update(tab.id, { active: true });

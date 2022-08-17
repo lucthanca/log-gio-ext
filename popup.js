@@ -14,9 +14,6 @@ function getTabsList(showOnlyCurrentWindow = false) {
   return new Promise(resolve => {
     if (showOnlyCurrentWindow) {
       chrome.windows.getCurrent({ populate: true }, window => {
-        // chrome.tabs.getAllInWindow(window.id, tabs => {
-        //   resolve(tabs);
-        // })
 
         const queryinfo = {
           currentWindow: true,
@@ -38,6 +35,7 @@ let startScriptBtn = document.querySelector('.-start');
 startScriptBtn.addEventListener('click', (e) => {
   e.preventDefault();
   isRunning().then(running => {
+    let stateContainer = document.getElementById('script-state-message');
     if (running !== true) {
       toggleState().then(response => {
         messageWrapper.dispatchEvent(
@@ -48,6 +46,9 @@ startScriptBtn.addEventListener('click', (e) => {
         );
         startScriptBtn.innerText = "Dừng";
         startScriptBtn.classList.add('running');
+        stateContainer.classList.add('running');
+        stateContainer.classList.remove('stopped');
+        stateContainer.innerHTML = `<p>Script is running...</p>`;
       });
     } else {
       toggleState(false).then(response => {
@@ -59,6 +60,9 @@ startScriptBtn.addEventListener('click', (e) => {
         );
         startScriptBtn.innerText = "Bắt Đầu";
         startScriptBtn.classList.remove('running');
+        stateContainer.classList.add('stopped');
+        stateContainer.classList.remove('running');
+        stateContainer.innerHTML = `<p>Script is stopped!!!</p>`;
       });
     }
   });

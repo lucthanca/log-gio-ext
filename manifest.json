@@ -1,7 +1,7 @@
 {
   "name": "Auto Log Giờ",
   "description": "Auto Log giờ BSS Group",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "manifest_version": 3,
   "icons": {
     "16": "images/ico/time.png",
@@ -21,17 +21,18 @@
         "https://hr.bssgroup.vn/log-gio-lam-viec.html*"
       ],
       "js": [
-        "content.js"
+        "main_content.js"
       ]
     }
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "service_worker.js"
   },
   "permissions": [
     "tabs",
     "storage",
-    "clipboardWrite"
+    "clipboardWrite",
+    "notifications"
   ],
   "content_security_policy": {
     "extension_page": "script-src 'self' 'unsafe-eval'; object-src 'self'"
