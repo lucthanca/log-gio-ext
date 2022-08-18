@@ -261,7 +261,7 @@ chrome.runtime.onMessage.addListener((rq, sender, sendResponse) => {
         if (!data.logged[currentDate]) data.logged[currentDate] = {};
         data.logged[currentDate][time] = totalSecondCurrentTime;
         if (data.targetTabId) {
-          chrome.tabs.remove(data.targetTabId, () => sendResponse({type: 'success', message: "Done!"}));
+          chrome.tabs.remove(data.targetTabId, () => {});
           data.targetTabId = null;
         }
         chrome.storage.sync.set({'logTimeData': data}).then(resp => {
@@ -272,9 +272,11 @@ chrome.runtime.onMessage.addListener((rq, sender, sendResponse) => {
             type: 'basic',
             requireInteraction: true
           });
+          sendResponse({type: 'success', message: "Done!"});
         });
       })
     }
+    return true;
   }
 });
 
