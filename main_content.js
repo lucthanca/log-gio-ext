@@ -32,6 +32,13 @@ function initExtensionContext() {
   const isAutolog = urlParams.get('autolog')
   if (isAutolog === '1') {
     // Execute click log button
-    logTime();
+    let logBtn = document.querySelector('.time-counter button.btn-log');
+    if (logBtn) {
+      if (!logBtn.classList.contains('btn-danger')) {
+        // Chưa log
+        logBtn.click();
+      }
+      setTimeout(() => {logTime().then(resp => {})}, 3000);
+    }
   }
 }

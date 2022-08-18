@@ -23,65 +23,75 @@ const configProcessorMappers = {
   "log-sang": (loggedData, logTime = '08:29:00') => {
     let currentDate = new Date().toLocaleDateString("vi-VN");
     if (loggedData && loggedData[currentDate] && loggedData[currentDate]['log-sang']) {
-      throw new Error("Đã log sáng");
+      throw "Đã log sáng";
     }
 
     if (!logTime) {
       logTime = '08:29:00';
     }
     
+    let breakTime = (11 * 3600) + (45 * 60);
+    
     let currentTime = new Date().toLocaleTimeString('vi-VN')
         currentTimeArr =  currentTime.split(':'),
-        totalSecondCurrentTime = parseInt((currentTimeArr[0] * 3600) + (currentTimeArr[1] * 60) + currentTimeArr[0]),
+        totalSecondCurrentTime = parseInt(currentTimeArr[0]) * 3600 + parseInt(currentTimeArr[1]) * 60 + parseInt(currentTimeArr[0]),
         logTimeSecond = 0;
 
     logTimeArr = logTime.split(':');
-    logTimeSecond = parseInt((logTimeArr[0] * 3600) + (logTimeArr[1] * 60) + logTimeArr[0]);
-    if (totalSecondCurrentTime < logTimeSecond) {
-      throw new Error("Chưa tới lúc log giờ");
+    logTimeSecond = parseInt(logTimeArr[0]) * 3600 + parseInt(logTimeArr[1]) * 60 + parseInt(logTimeArr[0]);
+    
+    if (totalSecondCurrentTime >= logTimeSecond && totalSecondCurrentTime <= breakTime) {
+      return true;
+    } else {
+      throw "Chưa tới lúc log giờ sáng";
     }
   },
   "log-chieu": (loggedData, logTime = '13:00:00') => {
     let currentDate = new Date().toLocaleDateString("vi-VN");
     if (loggedData && loggedData[currentDate] && loggedData[currentDate]['log-chieu']) {
-      throw new Error("Đã log chiều");
+      throw "Đã log chiều";
     }
     if (!logTime) {
       logTime = '13:00:00';
     }
+    let breakTime = (14 * 3600);
 
     let currentTime = new Date().toLocaleTimeString('vi-VN')
         currentTimeArr =  currentTime.split(':'),
-        totalSecondCurrentTime = parseInt((currentTimeArr[0] * 3600) + (currentTimeArr[1] * 60) + currentTimeArr[0]),
+        totalSecondCurrentTime = parseInt(currentTimeArr[0]) * 3600 + parseInt(currentTimeArr[1]) * 60 + parseInt(currentTimeArr[0]),
         logTimeSecond = 0;
 
     logTimeArr = logTime.split(':');
-    logTimeSecond = parseInt((logTimeArr[0] * 3600) + (logTimeArr[1] * 60) + logTimeArr[0]);
-    if (totalSecondCurrentTime < logTimeSecond) {
-      throw new Error("Chưa tới lúc log giờ");
+    logTimeSecond = parseInt(logTimeArr[0]) * 3600 + parseInt(logTimeArr[1]) * 60 + parseInt(logTimeArr[0]);
+    if (totalSecondCurrentTime >= logTimeSecond && totalSecondCurrentTime <= breakTime) {
+      return true;
+    } else {
+      throw "Chưa tới lúc log giờ chiều";
     }
   },
   "stop-chieu": (loggedData, logTime = '18:55:00') => {
     let currentDate = new Date().toLocaleDateString("vi-VN");
     if (loggedData && loggedData[currentDate] && loggedData[currentDate]['stop-chieu']) {
-      throw new Error("Đã stop log chiều");
+      throw "Đã stop log chiều";
     }
     if (!logTime) {
       logTime = '18:55:00';
     }
+    let breakTime = 19 * 3600;
     let currentTime = new Date().toLocaleTimeString('vi-VN')
         currentTimeArr =  currentTime.split(':'),
-        totalSecondCurrentTime = parseInt((currentTimeArr[0] * 3600) + (currentTimeArr[1] * 60) + currentTimeArr[0]),
+        totalSecondCurrentTime = parseInt(currentTimeArr[0]) * 3600 + parseInt(currentTimeArr[1]) * 60 + parseInt(currentTimeArr[0]),
         logTimeSecond = 0;
 
     logTimeArr = logTime.split(':');
-    logTimeSecond = parseInt((logTimeArr[0] * 3600) + (logTimeArr[1] * 60) + logTimeArr[0]);
-    if (totalSecondCurrentTime < logTimeSecond) {
-      throw new Error("Chưa tới lúc log giờ");
+    logTimeSecond = parseInt(logTimeArr[0]) * 3600 + parseInt(logTimeArr[1]) * 60 + parseInt(logTimeArr[0]);
+    if (totalSecondCurrentTime > breakTime) {
+      throw "Đã miss thời gian stop log giờ!";
     }
-
-    if (totalSecondCurrentTime > 19 * 3600) {
-      throw new Error("Đã miss thời gian stop log giờ!");
+    if (totalSecondCurrentTime >= logTimeSecond) {
+      return true;
+    } else {
+      throw "Chưa tới lúc stop log giờ";
     }
   }
 };
@@ -90,20 +100,39 @@ function createRunningTaskInterval(intervalTime = 60000) {
   return setInterval(async () => {
     console.log('Checking time...');
     let logTimeData = await loadLogTimeData();
+    // DEBUG 
+    console.log({logTimeData});
     if (!logTimeData?.configs) {
       return false
     }
     
-    // DEBUG console.log(logTimeData.configs);
+    let currentLogTime = null;
     try {
       Object.entries(configProcessorMappers).forEach(([cnfKey, callback]) => {
-        if (logTimeData.configs[cnfKey] === true) {
-          callback(logTimeData.logged, logTimeData.configs[cnfKey + '-time']); 
+        let checkTime = false;
+        try {
+          if (logTimeData.configs[cnfKey] === true) {
+            checkTime = callback(logTimeData.logged, logTimeData.configs[cnfKey + '-time']); 
+          }
+        } catch (e) {
+          // DEBUG
+          console.log(e);
+        }
+        if (checkTime === true) {
+          currentLogTime = cnfKey;
+          throw "Break forEach";
         }
       });
-    } catch(e) {
+    } catch (e) {
+      if (e !== "Break forEach") {
+        return false;
+      }
+    }
+
+    if (currentLogTime === null) {
       return false;
     }
+
     let listChromeWindows = await getTabsList(),
         count = 0;
     listChromeWindows.forEach(cWindow => {
@@ -127,7 +156,7 @@ function createRunningTaskInterval(intervalTime = 60000) {
           activeTab = tab;
         });
         count++;
-      } else if (activeTab.active === false) {
+      } else if (count > 0 && activeTab?.active === false) {
         chrome.tabs.update(activeTab.id, { active: true });
       }
     });
@@ -200,7 +229,7 @@ chrome.runtime.onMessage.addListener((rq, sender, sendResponse) => {
     let toiBreakPoint = (19 * 3600); // 19h toi
     let currentTimeArr =  currentTime.split(':');
     let time,
-        totalSecondCurrentTime = parseInt((currentTimeArr[0] * 3600) + (currentTimeArr[1] * 60) + currentTimeArr[0]);
+        totalSecondCurrentTime = parseInt(currentTimeArr[0]) * 3600 + parseInt(currentTimeArr[1]) * 60 + parseInt(currentTimeArr[0]);
     if (totalSecondCurrentTime < sangBreakPoint) {
       time = 'log-sang';
     } else if (totalSecondCurrentTime < chieuBreakPoint) {
@@ -210,9 +239,17 @@ chrome.runtime.onMessage.addListener((rq, sender, sendResponse) => {
     }
     if (time) {
       loadLogTimeData().then(data => {
-        data.logged[currentDate] = {};
+        if (!data.logged) data.logged = {};
+        if (!data.logged[currentDate]) data.logged[currentDate] = {};
         data.logged[currentDate][time] = totalSecondCurrentTime;
         chrome.storage.sync.set({'logTimeData': data}).then(resp => {
+          chrome.notifications.create('', {
+            title: `Đã ${time}.`,
+            message: 'Mỗi ngày 1 xiên bẩn',
+            iconUrl: './images/meo-cuoi-nham-hiem_medium.jpg',
+            type: 'basic',
+            requireInteraction: true
+          });
           chrome.tabs.remove(activeTab.id, () => sendResponse({type: 'success', message: "Done!"}));
         });
       })
