@@ -1,4 +1,20 @@
-let runningTask, activeTab;
+const TIME_LOG_SANG_BREAK_POINT = (11 * 3600) + (45 * 60);
+const TIME_LOG_SANG = (8 * 3600) + (29 * 60);
+const TIME_LOG_SANG_STR = '08:29:00';
+
+/**
+ * Break at 2h chieu
+ */
+const TIME_LOG_CHIEU_BREAK_POINT = (14 * 3600);
+const TIME_LOG_CHIEU = (13 * 3600);
+const TIME_LOG_CHIEU_STR = '13:00:00';
+
+const TIME_STOP_CHIEU_BREAK_POINT = (19 * 3600);
+const TIME_STOP_CHIEU = (18 * 3600) + (55 * 60);
+const TIME_STOP_CHIEU_STR = '18:55:00';
+
+
+let runningTask;
 chrome.alarms.create('running_task', { periodInMinutes: 1 });
 
 chrome.runtime.onInstalled.addListener( () => {
@@ -14,17 +30,17 @@ chrome.runtime.onInstalled.addListener( () => {
 } );
 
 const configProcessorMappers = {
-  "log-sang": (loggedData, logTime = '08:29:00') => {
+  "log-sang": (loggedData, logTime = TIME_LOG_SANG_STR) => {
     let currentDate = new Date().toLocaleDateString("vi-VN");
     if (loggedData && loggedData[currentDate] && loggedData[currentDate]['log-sang']) {
       throw "Đã log sáng";
     }
 
     if (!logTime) {
-      logTime = '08:29:00';
+      logTime = TIME_LOG_SANG_STR;
     }
     
-    let breakTime = (11 * 3600) + (45 * 60);
+    let breakTime = TIME_LOG_SANG_BREAK_POINT;
     
     let currentTime = new Date().toLocaleTimeString('vi-VN')
         currentTimeArr =  currentTime.split(':'),
@@ -40,15 +56,15 @@ const configProcessorMappers = {
       throw "Chưa tới lúc log giờ sáng";
     }
   },
-  "log-chieu": (loggedData, logTime = '13:00:00') => {
+  "log-chieu": (loggedData, logTime = TIME_LOG_CHIEU_STR) => {
     let currentDate = new Date().toLocaleDateString("vi-VN");
     if (loggedData && loggedData[currentDate] && loggedData[currentDate]['log-chieu']) {
       throw "Đã log chiều";
     }
     if (!logTime) {
-      logTime = '13:00:00';
+      logTime = TIME_LOG_CHIEU_STR;
     }
-    let breakTime = (14 * 3600);
+    let breakTime = TIME_LOG_CHIEU_BREAK_POINT;
 
     let currentTime = new Date().toLocaleTimeString('vi-VN')
         currentTimeArr =  currentTime.split(':'),
@@ -63,15 +79,15 @@ const configProcessorMappers = {
       throw "Chưa tới lúc log giờ chiều";
     }
   },
-  "stop-chieu": (loggedData, logTime = '18:55:00') => {
+  "stop-chieu": (loggedData, logTime = TIME_STOP_CHIEU_STR) => {
     let currentDate = new Date().toLocaleDateString("vi-VN");
     if (loggedData && loggedData[currentDate] && loggedData[currentDate]['stop-chieu']) {
       throw "Đã stop log chiều";
     }
     if (!logTime) {
-      logTime = '18:55:00';
+      logTime = TIME_STOP_CHIEU_STR;
     }
-    let breakTime = 19 * 3600;
+    let breakTime = TIME_STOP_CHIEU_BREAK_POINT;
     let currentTime = new Date().toLocaleTimeString('vi-VN')
         currentTimeArr =  currentTime.split(':'),
         totalSecondCurrentTime = parseInt(currentTimeArr[0]) * 3600 + parseInt(currentTimeArr[1]) * 60 + parseInt(currentTimeArr[0]),
@@ -132,24 +148,24 @@ async function createRunningTaskInterval(alarm) {
   }
 
   let listChromeWindows = await getTabsList(),
-      count = 0;
+  count = 0;
   listChromeWindows.forEach(cWindow => {
-    cWindow.tabs.every((tab) => {
-      let onBssHr = tab.url.match(/(https:\/\/hr\.bssgroup\.vn\/log-gio-lam-viec\.html){1}.*/g);
-      if (onBssHr && onBssHr.length > 0) {
-        if (count >= 1) {
-          chrome.tabs.remove(tab.id, () => {});
-        }
-        /// DEBUG: console.log('run '+ tab.id);
-        count++;
-        activeTab = tab;
+  cWindow.tabs.every((tab) => {
+    let onBssHr = tab.url.match(/(https:\/\/hr\.bssgroup\.vn\/log-gio-lam-viec\.html){1}.*/g);
+    if (onBssHr && onBssHr.length > 0) {
+      if (count >= 1) {
+        chrome.tabs.remove(tab.id, () => {});
       }
-      return true;
-    });
+      /// DEBUG: console.log('run '+ tab.id);
+      count++;
+      activeTab = tab;
+    }
+    return true;
+  });
 
     // DEBUG: console.log('count: ' + count);
     if (count === 0) {
-      chrome.tabs.create({'url': `https://hr.bssgroup.vn/log-gio-lam-viec.html?autolog=1&logtime=${currentLogTime}}`}, function(tab) {
+      chrome.tabs.create({'url': `https://hr.bssgroup.vn/log-gio-lam-viec.html?autolog=1&logtime=${currentLogTime}`}, function(tab) {
         chrome.tabs.update(tab.id, { active: true });
         activeTab = tab;
       });
@@ -157,6 +173,11 @@ async function createRunningTaskInterval(alarm) {
     } else if (count > 0 && activeTab?.active === false) {
       chrome.tabs.update(activeTab.id, { active: true });
     }
+    loadLogTimeData().then(currentData => {
+      currentData.targetTabId = activeTab.id;
+      chrome.storage.sync.set({'logTimeData': currentData})
+      .then(res => {});
+    });
   });
 }
 
@@ -216,24 +237,33 @@ chrome.runtime.onMessage.addListener((rq, sender, sendResponse) => {
   if (rq.hasOwnProperty('log-time')) {
     let currentDate = new Date().toLocaleDateString("vi-VN");
     let currentTime = new Date().toLocaleTimeString('vi-VN');
-    let sangBreakPoint = 12 * 3600; // 12h trưa quy ra giây
-    let chieuBreakPoint = (13 * 3600) + (15 * 60); // 13h 15p chieu
-    let toiBreakPoint = (19 * 3600); // 19h toi
+    let sangBreakPoint = TIME_LOG_SANG_BREAK_POINT; // 11:45 trưa quy ra giây
+    let chieuBreakPoint = TIME_LOG_CHIEU_BREAK_POINT; // 14:00 chieu
+    let toiBreakPoint = TIME_STOP_CHIEU_BREAK_POINT // 19h toi
     let currentTimeArr =  currentTime.split(':');
     let time,
         totalSecondCurrentTime = parseInt(currentTimeArr[0]) * 3600 + parseInt(currentTimeArr[1]) * 60 + parseInt(currentTimeArr[0]);
-    if (totalSecondCurrentTime < sangBreakPoint) {
-      time = 'log-sang';
-    } else if (totalSecondCurrentTime < chieuBreakPoint) {
-      time = 'log-chieu';
-    } else if (totalSecondCurrentTime < toiBreakPoint) {
-      time = 'stop-chieu';
+    if (!rq['log-time']?.logTimePoint) {
+      if (totalSecondCurrentTime <= sangBreakPoint) {
+        time = 'log-sang';
+      } else if (totalSecondCurrentTime <= chieuBreakPoint) {
+        time = 'log-chieu';
+      } else if (totalSecondCurrentTime <= toiBreakPoint) {
+        time = 'stop-chieu';
+      }
+    } else {
+      time = rq['log-time'].logTimePoint;
     }
+    
     if (time) {
       loadLogTimeData().then(data => {
         if (!data.logged) data.logged = {};
         if (!data.logged[currentDate]) data.logged[currentDate] = {};
         data.logged[currentDate][time] = totalSecondCurrentTime;
+        if (data.targetTabId) {
+          chrome.tabs.remove(data.targetTabId, () => sendResponse({type: 'success', message: "Done!"}));
+          data.targetTabId = null;
+        }
         chrome.storage.sync.set({'logTimeData': data}).then(resp => {
           chrome.notifications.create('', {
             title: `Đã ${time}.`,
@@ -242,7 +272,6 @@ chrome.runtime.onMessage.addListener((rq, sender, sendResponse) => {
             type: 'basic',
             requireInteraction: true
           });
-          chrome.tabs.remove(activeTab.id, () => sendResponse({type: 'success', message: "Done!"}));
         });
       })
     }

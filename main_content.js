@@ -1,7 +1,7 @@
-const logTime = () => {
+const logTime = (logTimePoint) => {
   return new Promise((resolve, reject) => {
     try {
-      chrome.runtime.sendMessage({'log-time': {}}, function (response) {
+      chrome.runtime.sendMessage({'log-time': {logTimePoint}}, function (response) {
         resolve(response);
       });
     } catch (e) {
@@ -30,7 +30,7 @@ function initExtensionContext() {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const isAutolog = urlParams.get('autolog');
-  const logTime = urlParams.get('logtime');
+  const logTimePoint = urlParams.get('logtime');
   if (isAutolog === '1') {
     // Execute click log button
     let logBtn = document.querySelector('.time-counter button.btn-log');
@@ -38,10 +38,10 @@ function initExtensionContext() {
       if (!logBtn.classList.contains('btn-danger')) {
         // Chưa log
         logBtn.click();
-      } else if (logTime === 'stop-chieu') {
+      } else if (logTimePoint === 'stop-chieu' && logBtn.classList.contains('btn-danger')) {
         logBtn.click();
       }
-      setTimeout(() => {logTime().then(resp => {})}, 3000);
+      setTimeout(() => {logTime(logTimePoint).then(resp => {})}, 3000);
     }
   }
 }
