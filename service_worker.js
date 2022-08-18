@@ -197,11 +197,6 @@ chrome.runtime.onMessage.addListener((rq, sender, sendResponse) => {
       currentData.running = rq.running;
       chrome.storage.sync.set({'logTimeData': currentData})
       .then(res => {
-        if (rq.running === true) {
-          runningTask = createRunningTaskInterval(60000);
-        } else {
-          clearInterval(runningTask);
-        }
         sendResponse({type: 'success', message: rq.running ? "Started Script!!!": "Stop Script!!!"})
       });
     });
