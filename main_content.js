@@ -29,13 +29,16 @@ function initExtensionContext() {
 
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
-  const isAutolog = urlParams.get('autolog')
+  const isAutolog = urlParams.get('autolog');
+  const logTime = urlParams.get('logtime');
   if (isAutolog === '1') {
     // Execute click log button
     let logBtn = document.querySelector('.time-counter button.btn-log');
     if (logBtn) {
       if (!logBtn.classList.contains('btn-danger')) {
         // Chưa log
+        logBtn.click();
+      } else if (logTime === 'stop-chieu') {
         logBtn.click();
       }
       setTimeout(() => {logTime().then(resp => {})}, 3000);

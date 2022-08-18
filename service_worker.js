@@ -149,7 +149,7 @@ async function createRunningTaskInterval(alarm) {
 
     // DEBUG: console.log('count: ' + count);
     if (count === 0) {
-      chrome.tabs.create({'url': `https://hr.bssgroup.vn/log-gio-lam-viec.html?autolog=1`}, function(tab) {
+      chrome.tabs.create({'url': `https://hr.bssgroup.vn/log-gio-lam-viec.html?autolog=1&logtime=${currentLogTime}}`}, function(tab) {
         chrome.tabs.update(tab.id, { active: true });
         activeTab = tab;
       });
