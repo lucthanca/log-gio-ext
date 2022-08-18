@@ -1,4 +1,6 @@
 let runningTask, activeTab;
+chrome.alarms.create('running_task', { periodInMinutes: 1 });
+
 chrome.runtime.onInstalled.addListener( () => {
   console.log("Khởi tạo Service Worker...");
 
@@ -8,14 +10,6 @@ chrome.runtime.onInstalled.addListener( () => {
     iconUrl: './images/meo-cuoi-nham-hiem_medium.jpg',
     type: 'basic',
     requireInteraction: true
-  });
-
-  let response = loadLogTimeData();
-  return response.then(logTimeData => {
-    if (logTimeData?.running === true) {
-      console.log('Tái tạo tác vụ...');
-      runningTask = createRunningTaskInterval(60000);
-    }
   });
 } );
 
@@ -95,72 +89,75 @@ const configProcessorMappers = {
     }
   }
 };
+chrome.alarms.onAlarm.addListener(alarm => createRunningTaskInterval(alarm));
 
-function createRunningTaskInterval(intervalTime = 60000) {
-  return setInterval(async () => {
-    console.log('Checking time...');
-    let logTimeData = await loadLogTimeData();
-    // DEBUG 
-    console.log({logTimeData});
-    if (!logTimeData?.configs) {
-      return false
-    }
-    
-    let currentLogTime = null;
-    try {
-      Object.entries(configProcessorMappers).forEach(([cnfKey, callback]) => {
-        let checkTime = false;
-        try {
-          if (logTimeData.configs[cnfKey] === true) {
-            checkTime = callback(logTimeData.logged, logTimeData.configs[cnfKey + '-time']); 
-          }
-        } catch (e) {
-          // DEBUG
-          console.log(e);
-        }
-        if (checkTime === true) {
-          currentLogTime = cnfKey;
-          throw "Break forEach";
-        }
-      });
-    } catch (e) {
-      if (e !== "Break forEach") {
-        return false;
-      }
-    }
-
-    if (currentLogTime === null) {
-      return false;
-    }
-
-    let listChromeWindows = await getTabsList(),
-        count = 0;
-    listChromeWindows.forEach(cWindow => {
-      cWindow.tabs.every((tab) => {
-        let onBssHr = tab.url.match(/(https:\/\/hr\.bssgroup\.vn\/log-gio-lam-viec\.html){1}.*/g);
-        if (onBssHr && onBssHr.length > 0) {
-          if (count >= 1) {
-            chrome.tabs.remove(tab.id, () => {});
-          }
-          /// DEBUG: console.log('run '+ tab.id);
-          count++;
-          activeTab = tab;
-        }
-        return true;
-      });
+async function createRunningTaskInterval(alarm) {
+  if (alarm.name !== 'running_task') {
+    return false;
+  }
   
-      // DEBUG: console.log('count: ' + count);
-      if (count === 0) {
-        chrome.tabs.create({'url': `https://hr.bssgroup.vn/log-gio-lam-viec.html?autolog=1`}, function(tab) {
-          chrome.tabs.update(tab.id, { active: true });
-          activeTab = tab;
-        });
-        count++;
-      } else if (count > 0 && activeTab?.active === false) {
-        chrome.tabs.update(activeTab.id, { active: true });
+  console.log('Checking time...');
+  let logTimeData = await loadLogTimeData();
+  // DEBUG 
+  console.log({logTimeData});
+  if (!logTimeData?.configs || logTimeData?.running !== true) {
+    return false
+  }
+  
+  let currentLogTime = null;
+  try {
+    Object.entries(configProcessorMappers).forEach(([cnfKey, callback]) => {
+      let checkTime = false;
+      try {
+        if (logTimeData.configs[cnfKey] === true) {
+          checkTime = callback(logTimeData.logged, logTimeData.configs[cnfKey + '-time']); 
+        }
+      } catch (e) {
+        // DEBUG
+        console.log(e);
+      }
+      if (checkTime === true) {
+        currentLogTime = cnfKey;
+        throw "Break forEach";
       }
     });
-    }, intervalTime);
+  } catch (e) {
+    if (e !== "Break forEach") {
+      return false;
+    }
+  }
+
+  if (currentLogTime === null) {
+    return false;
+  }
+
+  let listChromeWindows = await getTabsList(),
+      count = 0;
+  listChromeWindows.forEach(cWindow => {
+    cWindow.tabs.every((tab) => {
+      let onBssHr = tab.url.match(/(https:\/\/hr\.bssgroup\.vn\/log-gio-lam-viec\.html){1}.*/g);
+      if (onBssHr && onBssHr.length > 0) {
+        if (count >= 1) {
+          chrome.tabs.remove(tab.id, () => {});
+        }
+        /// DEBUG: console.log('run '+ tab.id);
+        count++;
+        activeTab = tab;
+      }
+      return true;
+    });
+
+    // DEBUG: console.log('count: ' + count);
+    if (count === 0) {
+      chrome.tabs.create({'url': `https://hr.bssgroup.vn/log-gio-lam-viec.html?autolog=1`}, function(tab) {
+        chrome.tabs.update(tab.id, { active: true });
+        activeTab = tab;
+      });
+      count++;
+    } else if (count > 0 && activeTab?.active === false) {
+      chrome.tabs.update(activeTab.id, { active: true });
+    }
+  });
 }
 
 function getTabsList(showOnlyCurrentWindow = false) {
@@ -266,18 +263,4 @@ async function saveConfig (configs) {
 async function loadLogTimeData() {
   let result = await chrome.storage.sync.get(['logTimeData']);
   return result.logTimeData || {};
-}
-
-function addSong(data) {
-  var songs = getSongs();
-  songs.push(data);
-  localStorage.songs = JSON.stringify(songs)
-}
-
-function getSongs() {
-  if (!localStorage.songs) {
-      localStorage.songs = JSON.stringify([]);
-  }
-
-  return JSON.parse(localStorage.songs);
 }

@@ -32,7 +32,8 @@
     "tabs",
     "storage",
     "clipboardWrite",
-    "notifications"
+    "notifications",
+    "alarms"
   ],
   "content_security_policy": {
     "extension_page": "script-src 'self' 'unsafe-eval'; object-src 'self'"
