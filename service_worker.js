@@ -148,7 +148,7 @@ async function createRunningTaskInterval(alarm) {
   }
 
   let listChromeWindows = await getTabsList(),
-  count = 0;
+  count = 0, activeTab;
   listChromeWindows.forEach(cWindow => {
   cWindow.tabs.every((tab) => {
     let onBssHr = tab.url.match(/(https:\/\/hr\.bssgroup\.vn\/log-gio-lam-viec\.html){1}.*/g);
