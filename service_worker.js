@@ -104,11 +104,11 @@ async function createRunningTaskInterval(alarm) {
   console.log('Checking time...');
   let thu = new Date().toLocaleString('vi-VN', {weekday:'long'});
   if (['Thứ Bảy', 'Chủ Nhật'].includes(thu)) {
-    console.log(thu + " không cần phải log giờ =))");
+    console.log(`${new Date().toLocaleTimeString('vi-VN')}: ${thu} không cần phải log giờ =))`);
     return false;
   }
   let logTimeData = await loadLogTimeData();
-  
+
   console.log({"DEBUG": {logTimeData}});
   if (!logTimeData?.configs || logTimeData?.running !== true) {
     return false
@@ -124,7 +124,7 @@ async function createRunningTaskInterval(alarm) {
         }
       } catch (e) {
         // DEBUG
-        console.log(e);
+        console.log(`${new Date().toLocaleTimeString('vi-VN')}: ${e}`);
       }
       if (checkTime === true) {
         currentLogTime = cnfKey;
