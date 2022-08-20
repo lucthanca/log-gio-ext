@@ -1,3 +1,5 @@
+let runningTask;
+
 const TIME_LOG_SANG_BREAK_POINT = (11 * 3600) + (45 * 60);
 const TIME_LOG_SANG = (8 * 3600) + (29 * 60);
 const TIME_LOG_SANG_STR = '08:29:00';
@@ -13,8 +15,6 @@ const TIME_STOP_CHIEU_BREAK_POINT = (19 * 3600) + 60;
 const TIME_STOP_CHIEU = (18 * 3600) + (55 * 60);
 const TIME_STOP_CHIEU_STR = '18:55:00';
 
-
-let runningTask;
 chrome.alarms.create('running_task', { periodInMinutes: 1 });
 
 chrome.runtime.onInstalled.addListener( () => {
@@ -29,90 +29,84 @@ chrome.runtime.onInstalled.addListener( () => {
   });
 } );
 
-const configProcessorMappers = {
-  "log-sang": (loggedData, logTime = TIME_LOG_SANG_STR) => {
-    let currentDate = new Date().toLocaleDateString("vi-VN");
-    if (loggedData && loggedData[currentDate] && loggedData[currentDate]['log-sang']) {
-      throw "Đã log sáng";
-    }
+const LOG_SANG_KEY = 'log-sang';
+const LOG_CHIEU_KEY = 'log-chieu';
+const STOP_CHIEU_KEY = 'stop-chieu';
 
-    if (!logTime) {
-      logTime = TIME_LOG_SANG_STR;
-    }
-    
-    let breakTime = TIME_LOG_SANG_BREAK_POINT;
-    
-    let currentTime = new Date().toLocaleTimeString('vi-VN')
-        currentTimeArr =  currentTime.split(':'),
-        totalSecondCurrentTime = parseInt(currentTimeArr[0]) * 3600 + parseInt(currentTimeArr[1]) * 60 + parseInt(currentTimeArr[0]),
-        logTimeSecond = 0;
-
-    logTimeArr = logTime.split(':');
-    logTimeSecond = parseInt(logTimeArr[0]) * 3600 + parseInt(logTimeArr[1]) * 60 + parseInt(logTimeArr[0]);
-    
-    if (totalSecondCurrentTime >= logTimeSecond && totalSecondCurrentTime <= breakTime) {
-      return true;
-    } else {
-      throw "Chưa tới lúc log giờ sáng";
-    }
+const LOG_TIME_POINTS = [LOG_SANG_KEY, LOG_CHIEU_KEY, STOP_CHIEU_KEY];
+const DEFAULT_TIME_LOG_CONFIG = {
+  [LOG_SANG_KEY]: {
+    'log_time_str': TIME_LOG_SANG_STR,
+    'miss_breakpoint': TIME_LOG_SANG_BREAK_POINT,
+    'log_time': TIME_LOG_SANG
   },
-  "log-chieu": (loggedData, logTime = TIME_LOG_CHIEU_STR) => {
-    let currentDate = new Date().toLocaleDateString("vi-VN");
-    if (loggedData && loggedData[currentDate] && loggedData[currentDate]['log-chieu']) {
-      throw "Đã log chiều";
-    }
-    if (!logTime) {
-      logTime = TIME_LOG_CHIEU_STR;
-    }
-    let breakTime = TIME_LOG_CHIEU_BREAK_POINT;
-
-    let currentTime = new Date().toLocaleTimeString('vi-VN')
-        currentTimeArr =  currentTime.split(':'),
-        totalSecondCurrentTime = parseInt(currentTimeArr[0]) * 3600 + parseInt(currentTimeArr[1]) * 60 + parseInt(currentTimeArr[0]),
-        logTimeSecond = 0;
-
-    logTimeArr = logTime.split(':');
-    logTimeSecond = parseInt(logTimeArr[0]) * 3600 + parseInt(logTimeArr[1]) * 60 + parseInt(logTimeArr[0]);
-    if (totalSecondCurrentTime >= logTimeSecond && totalSecondCurrentTime <= breakTime) {
-      return true;
-    } else {
-      throw "Chưa tới lúc log giờ chiều";
-    }
+  [LOG_CHIEU_KEY]: {
+    'log_time_str': TIME_LOG_CHIEU_STR,
+    'miss_breakpoint': TIME_LOG_CHIEU_BREAK_POINT,
+    'log_time': TIME_LOG_CHIEU
   },
-  "stop-chieu": (loggedData, logTime = TIME_STOP_CHIEU_STR) => {
-    let currentDate = new Date().toLocaleDateString("vi-VN");
-    if (loggedData && loggedData[currentDate] && loggedData[currentDate]['stop-chieu']) {
-      throw "Đã stop log chiều";
-    }
-    if (!logTime) {
-      logTime = TIME_STOP_CHIEU_STR;
-    }
-    let breakTime = TIME_STOP_CHIEU_BREAK_POINT;
-    let currentTime = new Date().toLocaleTimeString('vi-VN')
-        currentTimeArr =  currentTime.split(':'),
-        totalSecondCurrentTime = parseInt(currentTimeArr[0]) * 3600 + parseInt(currentTimeArr[1]) * 60 + parseInt(currentTimeArr[0]),
-        logTimeSecond = 0;
-
-    logTimeArr = logTime.split(':');
-    logTimeSecond = parseInt(logTimeArr[0]) * 3600 + parseInt(logTimeArr[1]) * 60 + parseInt(logTimeArr[0]);
-    if (totalSecondCurrentTime > breakTime) {
-      throw "Đã miss thời gian stop log giờ!";
-    }
-    if (totalSecondCurrentTime >= logTimeSecond) {
-      return true;
-    } else {
-      throw "Chưa tới lúc stop log giờ";
-    }
+  [STOP_CHIEU_KEY]: {
+    'log_time_str': TIME_STOP_CHIEU_STR,
+    'miss_breakpoint': TIME_STOP_CHIEU_BREAK_POINT,
+    'log_time': TIME_STOP_CHIEU
   }
 };
+const LOG_TIME_POINT_LABEL_MAPPER = {
+  [LOG_SANG_KEY]: 'Log giờ sáng',
+  [LOG_CHIEU_KEY]: 'Log giờ chiều',
+  [STOP_CHIEU_KEY]: 'Stop log giờ chiều'
+}
+const LOG_TIME_ERROR_MESSAGE_MAPPER = {
+  not_reach: "Chưa tới lúc %key",
+  miss: "Đã miss %key",
+  logged: "Đã %key"
+}
+
 chrome.alarms.onAlarm.addListener(alarm => createRunningTaskInterval(alarm));
 
+/**
+ * Check có đúng thời gian cần log giờ hay không
+ * @param {String} logTimeKey 
+ * @param {String} logTime
+ * @param {Object} loggedData 
+ */
+function checktime(logTimeKey, logTime, loggedData) {
+  let currentDate = new Date().toLocaleDateString("vi-VN"), logTimeSecond;
+  if (loggedData && loggedData[currentDate] && loggedData[currentDate][logTimeKey]) {
+    throw LOG_TIME_ERROR_MESSAGE_MAPPER['logged'].replace('%key', LOG_TIME_POINT_LABEL_MAPPER[logTimeKey]);
+  }
+  
+  let breakTime = DEFAULT_TIME_LOG_CONFIG[logTimeKey]['miss_breakpoint'],
+      currentTime = new Date().toLocaleTimeString('vi-VN')
+      currentTimeArr =  currentTime.split(':'),
+      totalSecondCurrentTime = parseInt(currentTimeArr[0]) * 3600 + parseInt(currentTimeArr[1]) * 60 + parseInt(currentTimeArr[0]);
+  if (totalSecondCurrentTime > breakTime) {
+    throw LOG_TIME_ERROR_MESSAGE_MAPPER['miss'].replace('%key', LOG_TIME_POINT_LABEL_MAPPER[logTimeKey]);
+  }
+  if (!logTime) {
+    logTimeSecond = DEFAULT_TIME_LOG_CONFIG[logTimeKey]['log_time'];
+  } else {
+    let logTimeArr = logTime.split(':');
+    logTimeSecond = parseInt(logTimeArr[0]) * 3600 + parseInt(logTimeArr[1]) * 60 + parseInt(logTimeArr[2]);
+  }
+  if (totalSecondCurrentTime >= logTimeSecond) {
+    // Valid
+    return true;
+  } else {
+    throw LOG_TIME_ERROR_MESSAGE_MAPPER['not_reach'].replace('%key', LOG_TIME_POINT_LABEL_MAPPER[logTimeKey]);
+  }
+}
 async function createRunningTaskInterval(alarm) {
   if (alarm.name !== 'running_task') {
     return false;
   }
   
   console.log('Checking time...');
+  let thu = new Date().toLocaleString('vi-VN', {weekday:'long'});
+  if (['Thứ Bảy', 'Chủ Nhật'].includes(thu)) {
+    console.log(thu + " không cần phải log giờ =))");
+    return false;
+  }
   let logTimeData = await loadLogTimeData();
   // DEBUG 
   console.log({logTimeData});
@@ -122,11 +116,11 @@ async function createRunningTaskInterval(alarm) {
   
   let currentLogTime = null;
   try {
-    Object.entries(configProcessorMappers).forEach(([cnfKey, callback]) => {
+    LOG_TIME_POINTS.forEach(logTimeKey => {
       let checkTime = false;
       try {
-        if (logTimeData.configs[cnfKey] === true) {
-          checkTime = callback(logTimeData.logged, logTimeData.configs[cnfKey + '-time']); 
+        if (logTimeData.configs[logTimeKey] === true) {
+          checkTime = checktime(logTimeKey, logTimeData.configs[logTimeKey + '-time'], logTimeData.logged); 
         }
       } catch (e) {
         // DEBUG
@@ -280,7 +274,7 @@ chrome.runtime.onMessage.addListener((rq, sender, sendResponse) => {
   }
 });
 
-async function saveConfig (configs) {
+async function saveConfig(configs) {
   let currentData = await loadLogTimeData();
   currentData.configs = configs;
   await chrome.storage.sync.set({'logTimeData': currentData});
