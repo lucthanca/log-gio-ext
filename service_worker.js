@@ -108,8 +108,8 @@ async function createRunningTaskInterval(alarm) {
     return false;
   }
   let logTimeData = await loadLogTimeData();
-  // DEBUG 
-  console.log({logTimeData});
+  
+  console.log({"DEBUG": {logTimeData}});
   if (!logTimeData?.configs || logTimeData?.running !== true) {
     return false
   }
@@ -141,34 +141,24 @@ async function createRunningTaskInterval(alarm) {
     return false;
   }
 
-  let listChromeWindows = await getTabsList(),
-  count = 0, activeTab;
+  let listChromeWindows = await getTabsList(), activeTab;
+
+  // Đóng hết các tab log giờ làm việc đang được mở trước đó, 
   listChromeWindows.forEach(cWindow => {
-  cWindow.tabs.every((tab) => {
+  cWindow.tabs.forEach((tab) => {
     let onBssHr = tab.url.match(/(https:\/\/hr\.bssgroup\.vn\/log-gio-lam-viec\.html){1}.*/g);
     if (onBssHr && onBssHr.length > 0) {
-      if (count >= 1) {
-        chrome.tabs.remove(tab.id, () => {});
-      }
-      /// DEBUG: console.log('run '+ tab.id);
-      count++;
-      activeTab = tab;
+      chrome.tabs.remove(tab.id, () => {});
     }
-    return true;
   });
 
-    // DEBUG: console.log('count: ' + count);
-    if (count === 0) {
-      chrome.tabs.create({'url': `https://hr.bssgroup.vn/log-gio-lam-viec.html?autolog=1&logtime=${currentLogTime}`}, function(tab) {
-        chrome.tabs.update(tab.id, { active: true });
-        activeTab = tab;
-      });
-      count++;
-    } else if (count > 0 && activeTab?.active === false) {
-      chrome.tabs.update(activeTab.id, { active: true });
-    }
+    chrome.tabs.create({'url': `https://hr.bssgroup.vn/log-gio-lam-viec.html?autolog=1&logtime=${currentLogTime}`}, function(tab) {
+      chrome.tabs.update(tab.id, { active: true });
+      activeTab = tab;
+    });
+    
     loadLogTimeData().then(currentData => {
-      currentData.targetTabId = activeTab.id;
+      currentData.targetTabId = activeTab?.id;
       chrome.storage.sync.set({'logTimeData': currentData})
       .then(res => {});
     });
