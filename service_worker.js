@@ -145,18 +145,22 @@ async function createRunningTaskInterval(alarm) {
 
   // Đóng hết các tab log giờ làm việc đang được mở trước đó, 
   listChromeWindows.forEach(cWindow => {
-  cWindow.tabs.forEach((tab) => {
-    let onBssHr = tab.url.match(/(https:\/\/hr\.bssgroup\.vn\/log-gio-lam-viec\.html){1}.*/g);
-    if (onBssHr && onBssHr.length > 0) {
-      chrome.tabs.remove(tab.id, () => {});
-    }
-  });
+    cWindow.tabs.forEach((tab) => {
+      loadLogTimeData().then(currentData => {
+        if(currentData.targetTabId !== tab.id) {
+          let onBssHr = tab.url.match(/(https:\/\/hr\.bssgroup\.vn\/log-gio-lam-viec\.html){1}.*/g);
+          if (onBssHr && onBssHr.length > 0) {
+            chrome.tabs.remove(tab.id, () => {});
+          }
+        }
+      });
+    });
 
     chrome.tabs.create({'url': `https://hr.bssgroup.vn/log-gio-lam-viec.html?autolog=1&logtime=${currentLogTime}`}, function(tab) {
       chrome.tabs.update(tab.id, { active: true });
       activeTab = tab;
     });
-    
+      
     loadLogTimeData().then(currentData => {
       currentData.targetTabId = activeTab?.id;
       chrome.storage.sync.set({'logTimeData': currentData})
