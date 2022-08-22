@@ -127,7 +127,7 @@ async function createRunningTaskInterval(alarm) {
         console.log(`${new Date().toLocaleTimeString('vi-VN')}: ${e}`);
       }
       if (checkTime === true) {
-        currentLogTime = cnfKey;
+        currentLogTime = logTimeKey;
         throw "Break forEach";
       }
     });
