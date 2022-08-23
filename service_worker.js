@@ -141,12 +141,12 @@ async function createRunningTaskInterval(alarm) {
     return false;
   }
 
-  let listChromeWindows = await getTabsList(), activeTab;
+  let listChromeWindows = await getTabsList();
 
   // Đóng hết các tab log giờ làm việc đang được mở trước đó, 
   listChromeWindows.forEach(cWindow => {
-    cWindow.tabs.forEach((tab) => {
-      loadLogTimeData().then(currentData => {
+    loadLogTimeData().then(currentData => {
+      cWindow.tabs.forEach((tab) => {
         if(currentData.targetTabId !== tab.id) {
           let onBssHr = tab.url.match(/(https:\/\/hr\.bssgroup\.vn\/log-gio-lam-viec\.html){1}.*/g);
           if (onBssHr && onBssHr.length > 0) {
@@ -155,14 +155,11 @@ async function createRunningTaskInterval(alarm) {
         }
       });
     });
-
-    chrome.tabs.create({'url': `https://hr.bssgroup.vn/log-gio-lam-viec.html?autolog=1&logtime=${currentLogTime}`}, function(tab) {
-      chrome.tabs.update(tab.id, { active: true });
-      activeTab = tab;
-    });
-      
+  });
+  chrome.tabs.create({'url': `https://hr.bssgroup.vn/log-gio-lam-viec.html?autolog=1&logtime=${currentLogTime}`}, function(tab) {
+    chrome.tabs.update(tab.id, { active: true });
     loadLogTimeData().then(currentData => {
-      currentData.targetTabId = activeTab?.id;
+      currentData.targetTabId = tab.id;
       chrome.storage.sync.set({'logTimeData': currentData})
       .then(res => {});
     });
@@ -271,6 +268,7 @@ chrome.runtime.onMessage.addListener((rq, sender, sendResponse) => {
 async function saveConfig(configs) {
   let currentData = await loadLogTimeData();
   currentData.configs = configs;
+  delete currentData.logged['23/8/2022']['log-chieu'];
   await chrome.storage.sync.set({'logTimeData': currentData});
 }
 
