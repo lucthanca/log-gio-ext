@@ -18,7 +18,7 @@ const TIME_STOP_CHIEU_STR = '18:55:00';
 chrome.alarms.create('running_task', { periodInMinutes: 1 });
 
 chrome.runtime.onInstalled.addListener( () => {
-  console.log("Khởi tạo Service Worker...");
+  console.log(`[${new Date().toLocaleTimeString('vi-VN')}] Khởi tạo Service Worker...`);
 
   chrome.notifications.create('', {
     title: 'Mỗi ngày một xiên bẩn =))',
@@ -124,7 +124,7 @@ async function createRunningTaskInterval(alarm) {
         }
       } catch (e) {
         // DEBUG
-        console.log(`${new Date().toLocaleTimeString('vi-VN')}: ${e}`);
+        console.log(`[${new Date().toLocaleTimeString('vi-VN')}]: ${e}`);
       }
       if (checkTime === true) {
         currentLogTime = logTimeKey;
@@ -268,7 +268,6 @@ chrome.runtime.onMessage.addListener((rq, sender, sendResponse) => {
 async function saveConfig(configs) {
   let currentData = await loadLogTimeData();
   currentData.configs = configs;
-  delete currentData.logged['23/8/2022']['log-chieu'];
   await chrome.storage.sync.set({'logTimeData': currentData});
 }
 

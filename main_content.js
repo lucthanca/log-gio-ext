@@ -35,7 +35,7 @@ function initExtensionContext() {
     // Execute click log button
     let logBtn = document.querySelector('.time-counter button.btn-log');
     if (logBtn) {
-      if (!logBtn.classList.contains('btn-danger')) {
+      if (!logBtn.classList.contains('btn-danger') && ['log-sang', 'log-chieu'].includes(logTimePoint)) {
         // Chưa log
         logBtn.click();
       } else if (logTimePoint === 'stop-chieu' && logBtn.classList.contains('btn-danger')) {
