@@ -23,6 +23,20 @@
       "js": [
         "main_content.js"
       ]
+    },
+    {
+      "matches":["https://pms.bssgroup.vn/default/viewtaskdetail/*"],
+      "js": ["pms.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "matches":["https://pms.bssgroup.vn/*"],
+      "resources": [
+        "css/pms/*",
+        "images/pms/*"
+      ]
     }
   ],
   "background": {
