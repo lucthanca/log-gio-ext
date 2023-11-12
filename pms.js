@@ -88,10 +88,23 @@ const initExtensionContext = () => {
 
   const formAddCommentel = document.querySelector('#form_add_comment');
   if (formAddCommentel && peopleE) {
-    peopleE.after(formAddCommentel);
+    const formAddCommentWrapper = document.createElement('div');
+    //add 1 div chứa comment floating right
+    formAddCommentWrapper.setAttribute('class', 'bc-view-pp-right');
+    peopleE.after(formAddCommentWrapper);
+    formAddCommentWrapper.appendChild(formAddCommentel);
   }
 
-  
+  //thêm class comment_item vào phần work_log
+  var workLogWrapper = document.getElementsByClassName("bc-worklog-task");
+  if (workLogWrapper && workLogWrapper[0]) {
+      workLogList = Array.from(workLogWrapper[0].querySelectorAll(":scope > div"));
+      // Sử dụng map để thêm class "item" vào mỗi thẻ con
+      workLogList.map(function(workLogItem) {
+        workLogItem.classList.add('comment_item');
+      });
+  }
+
   // const titleTaskE = document.querySelector('.tittle-task');
   const toolbar = document.querySelector('.pull-right.bc-pull-right-custom');
   // const getIsFloat = () => getComputedStyle(toolbar).getPropertyValue('position') !== 'fixed';
@@ -125,55 +138,24 @@ const initExtensionContext = () => {
 
   const newFixedWrapperEl = document.createElement('div');
 
-  // Tạo 1 wrapper mới để bọc element task status, element này sẽ được dùng để fixed khi scroll
+  // Tạo 1 wrapper mới để bọc element task status, element này sẽ được dùng để fixed
   if (taskStatusDropdownEl) {
     taskStatusWrapperEl = taskStatusDropdownEl.closest('p');
     newFixedWrapperEl.append(taskStatusWrapperEl.children[0]);
     newFixedWrapperEl.append(taskStatusDropdownEl);
     taskStatusWrapperEl.append(newFixedWrapperEl);
-    taskStatusWrapperEl.style.height = `${newFixedWrapperEl.offsetHeight}px`;
+    // ném status vào toolbar
+    const toolbarDestination = (toolbar.offsetHeight - newFixedWrapperEl.offsetHeight) / 2;
+    newFixedWrapperEl.style.position = 'fixed';
+    newFixedWrapperEl.style.top = `${toolbarDestination}px`;
+    newFixedWrapperEl.style.zIndex = '8888';
   }
+  //focus search input
+  // document.getElementById('search').addEventListener('focus', function () {
+  //   const navBar = document.getElementById('navbar');
+  //   navBar.classList.add('wide');
+  // });
 
-  // điểm dừng của element task status khi trôi lên trên, mục tiêu sẽ là dừng ở giữa toolbar
-  const stopTarget = (toolbar.offsetHeight - newFixedWrapperEl.offsetHeight) / 2;
-  const moveToolbarToTop = (e) => {
-    
-    // console.log({ scrollTop: e.target.scrollTop, taskStatusWrapperElTop: initialTaskStatusWrapperElTop, parentOffsetTop: e.target.offsetTop, toolbarHeight: toolbar.offsetHeight });
-    // tính toán offsetTop thật của element task status khi nằm bên trong scrollable element
-    const fixedTargetRealOffsetTop = taskStatusWrapperEl.offsetTop - e.target.offsetTop;
-    
-    if (e.target.scrollTop >= fixedTargetRealOffsetTop) {
-      // giá trị position top mới của element task status khi scroll.
-      
-      const fixedTargetNewOffsetTop = e.target.offsetTop - (e.target.scrollTop - fixedTargetRealOffsetTop);
-      newFixedWrapperEl.style.position = 'fixed';
-      if (fixedTargetNewOffsetTop >= stopTarget) {
-        newFixedWrapperEl.style.top = `${fixedTargetNewOffsetTop}px`;
-      } else {
-        newFixedWrapperEl.style.top = `${stopTarget}px`;
-      }
-      
-      newFixedWrapperEl.style.zIndex = '8888';
-    } else {
-      newFixedWrapperEl.style.position = null;
-      newFixedWrapperEl.style.zIndex = null;
-    }
-    // if (!isFloating) {
-    //   if (scrollY < toolbarOffsetTop - 15) {
-    //     toolbar.classList.remove('fixed');
-    //     isFloating = true;
-    //   }
-    // }
-    // if (isFloating) {
-    //   if (scrollY >= toolbar.offsetTop - 15) {
-    //     toolbar.classList.add('fixed');
-    //     isFloating = false;
-    //   }
-    // }
-  };
-  document.getElementById('task_view_detail').addEventListener('scroll', moveToolbarToTop);
-
-  
   cleanLoading();
   var tesss = new URLSearchParams(window.location.search);
   let foundReviewId = null;

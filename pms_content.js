@@ -19,7 +19,7 @@ function initExtensionContext() {
     document.querySelector('.log-time-popup').style.display = 'block';
 			
     document.getElementsByTagName("BODY")[0].insertAdjacentHTML('beforeend', '<div id="wrapperfull" style="display: block"></div>');
-    ocument.querySelector('#wrapperfull').style.display = 'block';
+    document.querySelector('#wrapperfull').style.display = 'block';
     return false;
   });
 }
