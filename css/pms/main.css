@@ -16,7 +16,7 @@
   --button-inactive: rgb(203 203 203 / 55%);
   --button-active:
   --dropdown-bg: #21242d;
-  --dropdown-hover: rgb(42 46 60);
+  --dropdown-hover: rgb(42 46 60 / 85%);
   --popup-bg: rgb(22 25 37);
   --search-bg: #14162b;
   --overlay-bg: rgba(36, 39, 59, 0.3);
@@ -39,7 +39,7 @@
   --button-inactive: rgb(203 203 203 / 55%);
   --button-active:
   --dropdown-bg: #21242d;
-  --dropdown-hover: rgb(42 46 60);
+  --dropdown-hover: rgb(42 46 60 / 85%);
   --popup-bg: rgb(22 25 37);
   --search-bg: #14162b;
   --overlay-bg: rgba(36, 39, 59, 0.3);
@@ -345,20 +345,44 @@ p.bc-detal-task-title span.title {
 .navbar.navbar-default #navbar ul:first-child, .navbar.navbar-default #navbar ul > .my-account {
   display: block;
 }
-.navbar.navbar-default #navbar li:hover {
-  background-color: var(--input-form-bg) !important;
+.navbar.navbar-default #navbar li.open, .navbar.navbar-default #navbar li:hover {
+  background-color: var(--dropdown-hover) !important;
+  border-radius: 0 1em 1em 0;
+  transition: 0.3s;
 }
 .navbar.navbar-default #navbar .open > .dropdown-toggle {
-  background-color: var(--input-form-bg) !important;
-}
-.navbar.navbar-default #navbar .navbar-right li:first-child {
   background-color: transparent !important;
 }
-.navbar.navbar-default #navbar .navbar-right li:first-child input:focus {
+.navbar.navbar-default #navbar .navbar-right > li:first-child {
+  background-color: transparent !important;
+}
+.navbar.navbar-default #navbar .navbar-right > li:first-child input:focus {
   background-color: var(--theme-bg-color) !important;
 }
-.navbar.navbar-default #navbar .navbar-right li:first-child .input-group-btn {
+.navbar.navbar-default #navbar .navbar-right > li:first-child .input-group-btn {
   display: none;
+}
+.navbar.navbar-default #navbar .navbar-right > li:last-child {
+  padding: 0 1em 0 1em;
+  margin-right: -15px;
+}
+.navbar.navbar-default #navbar .navbar-right > li:last-child ul {
+  width: 100%;
+  background-color: var(--dropdown-hover);
+  border-radius: 0 0 1em 1em;
+}
+.navbar.navbar-default #navbar .navbar-right > li:last-child ul a:hover {
+  background-color: var(--hover-menu-bg);
+  color: var(--theme-color);
+}
+.navbar.navbar-default #navbar .dropdown ul {
+  width: 100%;
+  background-color: var(--dropdown-hover);
+  border-radius: 0 1em 1em 0;
+}
+.navbar.navbar-default #navbar .dropdown ul a:hover {
+  background-color: var(--hover-menu-bg);
+  color: var(--theme-color);
 }
 .navbar.navbar-default .wide ul:first-child, .navbar.navbar-default .wide ul > .my-account {
   display: none;

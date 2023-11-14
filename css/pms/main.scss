@@ -15,7 +15,7 @@
   --button-inactive: rgb(203 203 203 / 55%);
   --button-active: 
   --dropdown-bg: #21242d;
-  --dropdown-hover: rgb(42 46 60);
+  --dropdown-hover: rgb(42 46 60 / 85%);
   --popup-bg: rgb(22 25 37);
   --search-bg:  #14162b;
   --overlay-bg: rgba(36, 39, 59, 0.3);
@@ -37,7 +37,7 @@
   --button-inactive: rgb(203 203 203 / 55%);
   --button-active: 
   --dropdown-bg: #21242d;
-  --dropdown-hover: rgb(42 46 60);
+  --dropdown-hover: rgb(42 46 60 / 85%);
   --popup-bg: rgb(22 25 37);
   --search-bg:  #14162b;
   --overlay-bg: rgba(36, 39, 59, 0.3);
@@ -350,13 +350,15 @@ p.bc-detal-task-title {
     ul:first-child, ul>.my-account{
       display: block;
     }
-    li:hover {
-      background-color: var(--input-form-bg) !important;
+    li.open, li:hover {
+      background-color: var(--dropdown-hover) !important;
+      border-radius: 0 1em 1em 0;
+      transition: 0.3s;
     }
     .open>.dropdown-toggle {
-      background-color: var(--input-form-bg) !important;
+      background-color: transparent !important;
     }
-    .navbar-right li:first-child {
+    .navbar-right>li:first-child {
       background-color: transparent !important;
       // search container
       input:focus {
@@ -364,6 +366,30 @@ p.bc-detal-task-title {
       }
       .input-group-btn {
         display: none;
+      }
+    }
+    .navbar-right>li:last-child {
+      padding: 0 1em 0 1em;
+      margin-right: -15px;
+      ul {
+        width: 100%;
+        background-color: var(--dropdown-hover);
+        border-radius: 0 0 1em 1em;
+        a:hover {
+          background-color: var(--hover-menu-bg);
+          color: var(--theme-color);
+        }
+      }
+    }
+    .dropdown {
+      ul {
+        width: 100%;
+        background-color: var(--dropdown-hover);
+        border-radius: 0 1em 1em 0;
+        a:hover {
+          background-color: var(--hover-menu-bg);
+          color: var(--theme-color);
+        }
       }
     }
   }
