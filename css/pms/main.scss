@@ -13,7 +13,7 @@
   --content-title-color: #999ba5;
   --content-bg: rgb(146 151 179 / 13%);
   --button-inactive: rgb(203 203 203 / 55%);
-  --button-active: 
+  // --button-active: 
   --dropdown-bg: #21242d;
   --dropdown-hover: rgb(42 46 60 / 85%);
   --popup-bg: rgb(22 25 37);
@@ -35,7 +35,7 @@
   --content-title-color: #999ba5;
   --content-bg: rgb(146 151 179 / 13%);
   --button-inactive: rgb(203 203 203 / 55%);
-  --button-active: 
+  // --button-active: 
   --dropdown-bg: #21242d;
   --dropdown-hover: rgb(42 46 60 / 85%);
   --popup-bg: rgb(22 25 37);
@@ -147,6 +147,21 @@ body {
         background: #515152;
       }
     }
+    .cancel {
+      color: var(--theme-color);
+    }
+    .btn-success-log {
+      background-color: var(--input-form-bg) !important;
+      border: none;
+      padding: 8px 26px;
+      color: var(--theme-color);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn-success-log:hover {
+      color: var(--dropdown-bg) !important;
+    }
   }
 }
 .area_note {
@@ -236,6 +251,17 @@ body {
     border: none !important;
     border: 1px solid var(--theme-bg-color) !important;
     margin-bottom: 15px;
+    form.form_add_reply {
+      .label {
+        color: var(--theme-color);
+      }
+      .formRight button:hover {
+        color: red;
+      }
+    }
+    span {
+      line-height: normal;
+    }
   }
 }
 div.jumbotron {
@@ -314,6 +340,22 @@ p.bc-detal-task-title {
 }
 .container.container_wrap {
   padding: 0!important;
+  .alert-success {
+    width: 100%;
+    border-radius: 1em;
+    margin-bottom: 0.5em;
+    background-color: var(--hover-menu-bg);
+    color: var(--theme-color);
+    font-weight: 700;
+    font-size: 1.2em;
+  }
+  .alert-danger {
+    margin-bottom: 0.5em;
+    background-color: rgb(255 0 0 / 50%);
+    border: none;
+    border-radius: 1em;
+    color: var(--theme-color);
+  }
 }
 // .container.container_wrap {
 //   max-width: 1250px;
@@ -568,8 +610,8 @@ footer.footer {
     }
   }
 }
-.grid-content, .review_wrap {
-  .formRowComment, .form_review_des {
+.grid-content, .review_wrap, .reply_wrap {
+  .formRowComment, .form_review_des, .formRight {
     button {
       background-color: var(--input-form-bg) !important;
       border: none;

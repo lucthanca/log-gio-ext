@@ -156,6 +156,18 @@ const initExtensionContext = () => {
   //   navBar.classList.add('wide');
   // });
 
+  //move message under navbar 
+  const messageSuccessEl = document.querySelector('.alert-success');
+  const messageDangerEl = document.querySelector('.alert-danger');
+  if (messageSuccessEl) {
+    const navBar = document.querySelector('.navbar-default');
+    navBar.after(messageSuccessEl);
+  }
+  if (messageDangerEl) {
+    const navBar = document.querySelector('.navbar-default');
+    navBar.after(messageDangerEl);
+  }
+
   cleanLoading();
   var tesss = new URLSearchParams(window.location.search);
   let foundReviewId = null;

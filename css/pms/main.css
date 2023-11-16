@@ -14,7 +14,6 @@
   --content-title-color: #999ba5;
   --content-bg: rgb(146 151 179 / 13%);
   --button-inactive: rgb(203 203 203 / 55%);
-  --button-active:
   --dropdown-bg: #21242d;
   --dropdown-hover: rgb(42 46 60 / 85%);
   --popup-bg: rgb(22 25 37);
@@ -37,7 +36,6 @@
   --content-title-color: #999ba5;
   --content-bg: rgb(146 151 179 / 13%);
   --button-inactive: rgb(203 203 203 / 55%);
-  --button-active:
   --dropdown-bg: #21242d;
   --dropdown-hover: rgb(42 46 60 / 85%);
   --popup-bg: rgb(22 25 37);
@@ -154,6 +152,21 @@ body.blue-mode::before {
 .log-time-popup .grid.create-task-custom .formRow:nth-child(4) select option, .log-time-popup .grid.create-task-custom .formRow:nth-child(2) select option, .log-time-popup .grid.create-task-custom .formRow:nth-child(3) select option {
   background: #515152;
 }
+.log-time-popup .grid.create-task-custom .cancel {
+  color: var(--theme-color);
+}
+.log-time-popup .grid.create-task-custom .btn-success-log {
+  background-color: var(--input-form-bg) !important;
+  border: none;
+  padding: 8px 26px;
+  color: var(--theme-color);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.log-time-popup .grid.create-task-custom .btn-success-log:hover {
+  color: var(--dropdown-bg) !important;
+}
 
 .area_note {
   border-bottom: 1px solid var(--border-color);
@@ -243,6 +256,15 @@ body.blue-mode::before {
   border: 1px solid var(--theme-bg-color) !important;
   margin-bottom: 15px;
 }
+#task_view_detail .comment_item form.form_add_reply .label {
+  color: var(--theme-color);
+}
+#task_view_detail .comment_item form.form_add_reply .formRight button:hover {
+  color: red;
+}
+#task_view_detail .comment_item span {
+  line-height: normal;
+}
 
 div.jumbotron {
   background: var(--theme-bg-color) !important;
@@ -322,6 +344,22 @@ p.bc-detal-task-title span.title {
 
 .container.container_wrap {
   padding: 0 !important;
+}
+.container.container_wrap .alert-success {
+  width: 100%;
+  border-radius: 1em;
+  margin-bottom: 0.5em;
+  background-color: var(--hover-menu-bg);
+  color: var(--theme-color);
+  font-weight: 700;
+  font-size: 1.2em;
+}
+.container.container_wrap .alert-danger {
+  margin-bottom: 0.5em;
+  background-color: rgba(255, 0, 0, 0.5);
+  border: none;
+  border-radius: 1em;
+  color: var(--theme-color);
 }
 
 .user-avatar {
@@ -546,7 +584,7 @@ footer.footer .container.container-custom a:hover {
   background-color: var(--hover-menu-bg);
 }
 
-.grid-content .formRowComment button, .grid-content .form_review_des button, .review_wrap .formRowComment button, .review_wrap .form_review_des button {
+.grid-content .formRowComment button, .grid-content .form_review_des button, .grid-content .formRight button, .review_wrap .formRowComment button, .review_wrap .form_review_des button, .review_wrap .formRight button, .reply_wrap .formRowComment button, .reply_wrap .form_review_des button, .reply_wrap .formRight button {
   background-color: var(--input-form-bg) !important;
   border: none;
   padding: 8px 26px;
@@ -556,31 +594,31 @@ footer.footer .container.container-custom a:hover {
   transition: 0.3s;
   margin: 20px 0 0 0;
 }
-.grid-content .formRowComment button:hover, .grid-content .form_review_des button:hover, .review_wrap .formRowComment button:hover, .review_wrap .form_review_des button:hover {
+.grid-content .formRowComment button:hover, .grid-content .form_review_des button:hover, .grid-content .formRight button:hover, .review_wrap .formRowComment button:hover, .review_wrap .form_review_des button:hover, .review_wrap .formRight button:hover, .reply_wrap .formRowComment button:hover, .reply_wrap .form_review_des button:hover, .reply_wrap .formRight button:hover {
   color: var(--dropdown-bg) !important;
 }
-.grid-content .formRowComment .cke, .grid-content .form_review_des .cke, .review_wrap .formRowComment .cke, .review_wrap .form_review_des .cke {
+.grid-content .formRowComment .cke, .grid-content .form_review_des .cke, .grid-content .formRight .cke, .review_wrap .formRowComment .cke, .review_wrap .form_review_des .cke, .review_wrap .formRight .cke, .reply_wrap .formRowComment .cke, .reply_wrap .form_review_des .cke, .reply_wrap .formRight .cke {
   border: none !important;
 }
-.grid-content .formRowComment .cke .cke_inner, .grid-content .form_review_des .cke .cke_inner, .review_wrap .formRowComment .cke .cke_inner, .review_wrap .form_review_des .cke .cke_inner {
+.grid-content .formRowComment .cke .cke_inner, .grid-content .form_review_des .cke .cke_inner, .grid-content .formRight .cke .cke_inner, .review_wrap .formRowComment .cke .cke_inner, .review_wrap .form_review_des .cke .cke_inner, .review_wrap .formRight .cke .cke_inner, .reply_wrap .formRowComment .cke .cke_inner, .reply_wrap .form_review_des .cke .cke_inner, .reply_wrap .formRight .cke .cke_inner {
   border-radius: 10px;
   background-color: transparent;
 }
-.grid-content .formRowComment .cke .cke_top, .grid-content .form_review_des .cke .cke_top, .review_wrap .formRowComment .cke .cke_top, .review_wrap .form_review_des .cke .cke_top {
+.grid-content .formRowComment .cke .cke_top, .grid-content .form_review_des .cke .cke_top, .grid-content .formRight .cke .cke_top, .review_wrap .formRowComment .cke .cke_top, .review_wrap .form_review_des .cke .cke_top, .review_wrap .formRight .cke .cke_top, .reply_wrap .formRowComment .cke .cke_top, .reply_wrap .form_review_des .cke .cke_top, .reply_wrap .formRight .cke .cke_top {
   border-radius: 10px 10px 0 0;
   background-color: var(--input-form-bg);
 }
-.grid-content .formRowComment .cke .cke_contents, .grid-content .form_review_des .cke .cke_contents, .review_wrap .formRowComment .cke .cke_contents, .review_wrap .form_review_des .cke .cke_contents {
+.grid-content .formRowComment .cke .cke_contents, .grid-content .form_review_des .cke .cke_contents, .grid-content .formRight .cke .cke_contents, .review_wrap .formRowComment .cke .cke_contents, .review_wrap .form_review_des .cke .cke_contents, .review_wrap .formRight .cke .cke_contents, .reply_wrap .formRowComment .cke .cke_contents, .reply_wrap .form_review_des .cke .cke_contents, .reply_wrap .formRight .cke .cke_contents {
   max-height: 413px;
 }
-.grid-content .formRowComment .cke .cke_contents iframe, .grid-content .form_review_des .cke .cke_contents iframe, .review_wrap .formRowComment .cke .cke_contents iframe, .review_wrap .form_review_des .cke .cke_contents iframe {
+.grid-content .formRowComment .cke .cke_contents iframe, .grid-content .form_review_des .cke .cke_contents iframe, .grid-content .formRight .cke .cke_contents iframe, .review_wrap .formRowComment .cke .cke_contents iframe, .review_wrap .form_review_des .cke .cke_contents iframe, .review_wrap .formRight .cke .cke_contents iframe, .reply_wrap .formRowComment .cke .cke_contents iframe, .reply_wrap .form_review_des .cke .cke_contents iframe, .reply_wrap .formRight .cke .cke_contents iframe {
   opacity: 0.8;
 }
-.grid-content .formRowComment .cke .cke_bottom, .grid-content .form_review_des .cke .cke_bottom, .review_wrap .formRowComment .cke .cke_bottom, .review_wrap .form_review_des .cke .cke_bottom {
+.grid-content .formRowComment .cke .cke_bottom, .grid-content .form_review_des .cke .cke_bottom, .grid-content .formRight .cke .cke_bottom, .review_wrap .formRowComment .cke .cke_bottom, .review_wrap .form_review_des .cke .cke_bottom, .review_wrap .formRight .cke .cke_bottom, .reply_wrap .formRowComment .cke .cke_bottom, .reply_wrap .form_review_des .cke .cke_bottom, .reply_wrap .formRight .cke .cke_bottom {
   border-radius: 0 0 10px 10px;
   background-color: var(--input-form-bg);
 }
-.grid-content .formRowComment .cke .cke_bottom .cke_resizer, .grid-content .form_review_des .cke .cke_bottom .cke_resizer, .review_wrap .formRowComment .cke .cke_bottom .cke_resizer, .review_wrap .form_review_des .cke .cke_bottom .cke_resizer {
+.grid-content .formRowComment .cke .cke_bottom .cke_resizer, .grid-content .form_review_des .cke .cke_bottom .cke_resizer, .grid-content .formRight .cke .cke_bottom .cke_resizer, .review_wrap .formRowComment .cke .cke_bottom .cke_resizer, .review_wrap .form_review_des .cke .cke_bottom .cke_resizer, .review_wrap .formRight .cke .cke_bottom .cke_resizer, .reply_wrap .formRowComment .cke .cke_bottom .cke_resizer, .reply_wrap .form_review_des .cke .cke_bottom .cke_resizer, .reply_wrap .formRight .cke .cke_bottom .cke_resizer {
   border-color: transparent var(--theme-color) transparent transparent;
 }
 
