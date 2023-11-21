@@ -56,7 +56,7 @@ const initExtensionContext = () => {
 
   const avatarE = document.querySelector('.avatar_img img');
   if (avatarE) {
-    avatarE.src = 'https://hr.bssgroup.vn/files/thumbnail/avatar/150x150/312-5de8c77b365e62.10419078.png';
+    avatarE.src = 'https://pms.bssgroup.vn/files/avatar/thumbnail/34x34/494-peppo.jpg';
     avatarE.classList.add('user-avatar');
   }
 
@@ -84,6 +84,7 @@ const initExtensionContext = () => {
     targetNode.after(rightContent);
     rightContent.append(peopleE);
     videoBgContainer.append(videoBg);
+    rightContent.style.height = targetNode.clientHeight + 'px';
   }
 
   const formAddCommentel = document.querySelector('#form_add_comment');
@@ -156,16 +157,16 @@ const initExtensionContext = () => {
   //   navBar.classList.add('wide');
   // });
 
-  //move message under navbar 
-  const messageSuccessEl = document.querySelector('.alert-success');
+  //move message above add-comment form 
+  const messageSuccessEl = document.querySelectorAll('.alert-success');
   const messageDangerEl = document.querySelector('.alert-danger');
   if (messageSuccessEl) {
-    const navBar = document.querySelector('.navbar-default');
-    navBar.after(messageSuccessEl);
+    const commentForm = document.querySelectorAll('.bc-view-pp-right')[1];
+    messageSuccessEl.forEach(item => commentForm.before(item));
   }
   if (messageDangerEl) {
-    const navBar = document.querySelector('.navbar-default');
-    navBar.after(messageDangerEl);
+    const commentForm = document.querySelectorAll('.bc-view-pp-right')[1];
+    commentForm.before(messageDangerEl);
   }
 
   cleanLoading();
