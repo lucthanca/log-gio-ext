@@ -21,8 +21,8 @@
   --overlay-bg: rgba(36, 39, 59, 0.3);
   --scrollbar-bg: rgb(1 2 3 / 40%);
   --input-bg: rgb(255 255 255 / 10%);
-  --link-color: #3a4fff;
-  --ucm-color: #2c93dd;
+  --link-color: #0e8dfd ;
+  --ucm-color: #66c5ff;
   --input-form-bg: rgb(167 212 251 / 65%);
 }
 
@@ -43,30 +43,40 @@
   --overlay-bg: rgba(36, 39, 59, 0.3);
   --scrollbar-bg: rgb(1 2 3 / 40%);
   --input-bg: rgb(255 255 255 / 10%);
-  --link-color: #3a4fff;
-  --ucm-color: #2c93dd;
+  --link-color: #0e8dfd ;
+  --ucm-color: #66c5ff;
   --input-form-bg: rgb(167 212 251 / 65%);
 }
 
 button, input, select, textarea {
-  border-radius: 0.8em;
   background: var(--input-form-bg);
   border: none;
-  box-shadow: inset 0.1rem 0.1rem 0.1rem var(--input-bg), inset -0.1rem -0.1rem 0.1rem var(--theme-color);
   background-color: transparent;
   transition: 0.3s ease;
+  border: 1px solid;
 }
 
 option {
-  color: var(--theme-bg-color);
+  color: black;
 }
 
 input[type=button] {
-  border: none;
-  border-radius: 1em !important;
-  background-color: var(--input-form-bg);
+  text-decoration: none;
+  font-weight: 400;
+  font-size: 14px;
   color: var(--theme-color);
-  transition: 0.3s ease;
+  background: linear-gradient(to right, var(--theme-color) 50%, transparent 50%);
+  background-size: 200% 100%;
+  background-position: right bottom;
+  transition: all 0.3s ease-out;
+  border: 1px solid;
+  line-height: 1.2;
+}
+
+input[type=button]:hover {
+  background-color: var(--input-form-bg) !important;
+  background-position: left bottom;
+  color: var(--popup-bg) !important;
 }
 
 p {
@@ -89,6 +99,15 @@ p {
 .bc-view-pp-left p:nth-child(2) .block_task_name {
   display: inline;
   margin-left: 0;
+}
+.bc-view-pp-left #update_status_task {
+  border-radius: 0;
+  padding-bottom: 1px;
+  box-shadow: none;
+  cursor: pointer;
+}
+.bc-view-pp-left #update_status_task option {
+  border-radius: 0 !important;
 }
 
 .bc-usercm {
@@ -194,16 +213,22 @@ body.blue-mode::before {
   text-decoration: none;
   font-weight: 400;
   font-size: 14px;
-  border-radius: 1em;
-  transition: 0.3s;
   background: transparent;
   border: none;
   color: var(--theme-color);
   padding: 12px 12px;
+  background: linear-gradient(to right, var(--theme-color) 50%, transparent 50%);
+  background-size: 200% 100%;
+  background-position: right bottom;
+  transition: all 0.3s ease-out;
 }
 .area_note .pull-right.bc-pull-right-custom *:hover {
   background-color: var(--input-form-bg) !important;
-  color: var(--theme-color) !important;
+  background-position: left bottom;
+  color: var(--popup-bg) !important;
+}
+.area_note .pull-right.bc-pull-right-custom span.log-time {
+  border-radius: 0 1em 0 0;
 }
 
 #task_view_detail {
@@ -369,6 +394,7 @@ p.bc-detal-task-title span.title {
 
 .container.container_wrap {
   padding: 0 !important;
+  max-width: 1284px;
 }
 
 .user-avatar {
@@ -394,7 +420,6 @@ p.bc-detal-task-title span.title {
 }
 .navbar.navbar-default #navbar li.open, .navbar.navbar-default #navbar li:hover {
   background-color: var(--dropdown-hover) !important;
-  border-radius: 0 1em 1em 0;
   transition: 0.3s;
 }
 .navbar.navbar-default #navbar .open > .dropdown-toggle {
@@ -402,6 +427,7 @@ p.bc-detal-task-title span.title {
 }
 .navbar.navbar-default #navbar .navbar-right > li:first-child {
   background-color: transparent !important;
+  background: none;
 }
 .navbar.navbar-default #navbar .navbar-right > li:first-child input:focus {
   background-color: var(--theme-bg-color) !important;
@@ -412,6 +438,7 @@ p.bc-detal-task-title span.title {
 .navbar.navbar-default #navbar .navbar-right > li:last-child {
   padding: 0 1em 0 1em;
   margin-right: -15px;
+  border-radius: 0 1em 1em 0;
 }
 .navbar.navbar-default #navbar .navbar-right > li:last-child ul {
   width: 100%;
@@ -425,11 +452,26 @@ p.bc-detal-task-title span.title {
 .navbar.navbar-default #navbar .dropdown ul {
   width: 100%;
   background-color: var(--dropdown-hover);
-  border-radius: 0 1em 1em 0;
 }
 .navbar.navbar-default #navbar .dropdown ul a:hover {
   background-color: var(--hover-menu-bg);
   color: var(--theme-color);
+}
+.navbar.navbar-default #navbar .dropdown ul b {
+  color: var(--theme-color);
+}
+.navbar.navbar-default #navbar li {
+  font-weight: 400;
+  border: none;
+  background: linear-gradient(to right, var(--dropdown-bg) 50%, transparent 50%);
+  background-size: 200% 100%;
+  background-position: right bottom;
+  transition: all 0.3s ease-out;
+}
+.navbar.navbar-default #navbar li:hover {
+  background-color: var(--input-form-bg) !important;
+  background-position: left bottom;
+  color: var(--popup-bg) !important;
 }
 .navbar.navbar-default .wide ul:first-child, .navbar.navbar-default .wide ul > .my-account {
   display: none;
@@ -478,10 +520,13 @@ div.bc-view-pp-left {
 .bc-view-pp-right__wrapper .alert-success {
   width: auto !important;
   border-radius: 1em;
+  border: none;
   background-color: var(--hover-menu-bg);
   color: var(--theme-color);
   font-weight: 700;
   font-size: 1.2em;
+  margin-bottom: 0;
+  text-align: center;
 }
 .bc-view-pp-right__wrapper .alert-danger {
   width: auto;
@@ -489,6 +534,7 @@ div.bc-view-pp-left {
   border: none;
   border-radius: 1em;
   color: var(--theme-color);
+  margin-bottom: 0;
 }
 .bc-view-pp-right__wrapper .bc-view-pp-right {
   width: 100%;
@@ -664,7 +710,7 @@ ul.ui-autocomplete li {
 
 /* Chrome, Edge, and Safari */
 *::-webkit-scrollbar {
-  width: 14px;
+  width: 8px;
   background: transparent !important;
 }
 
@@ -673,7 +719,6 @@ ul.ui-autocomplete li {
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: #392d39;
+  background-color: var(--input-form-bg);
   border-radius: 6px;
-  border: 3px double #a7a9ac !important;
 }/*# sourceMappingURL=main.css.map */
